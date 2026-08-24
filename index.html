@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Very Important Delivery for Khushi 🐨</title>
+  <meta name="description" content="An extremely official koala adoption. Refusal is not technically possible.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐨</text></svg>">
+</head>
+<body>
+
+  <!-- floating eucalyptus leaves background -->
+  <div class="leaves" aria-hidden="true">
+    <span class="leaf">🍃</span><span class="leaf">🍃</span><span class="leaf">🍃</span>
+    <span class="leaf">🍃</span><span class="leaf">🍃</span><span class="leaf">🍃</span>
+  </div>
+
+  <!-- confetti canvas -->
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <!-- ================= SCENE 1: THE DELIVERY ================= -->
+  <section class="scene" id="scene-delivery">
+    <p class="whisper">pssst… <strong>Khushi</strong>.</p>
+    <h1>A very important delivery has arrived.</h1>
+    <p class="sub">Something has been shipped to you from very, very far away.<br>
+    It has been asking for you <em>by name</em>.</p>
+
+    <button class="parcel" id="parcel" aria-label="Open the parcel">
+      <div class="parcel-box">
+        <div class="parcel-tape"></div>
+        <div class="parcel-stamp">URGENT ⚠️<br>EUCALYPTUS-CLASS CARGO</div>
+        <div class="parcel-label">FOR: <strong>KHUSHI</strong> (only)<br>
+        CONTENTS: 1 × best friend<br>
+        HANDLE WITH: hugs</div>
+      </div>
+      <div class="parcel-hint">tap to open 📦</div>
+    </button>
+  </section>
+
+  <!-- ================= SCENE 2: THE REVEAL ================= -->
+  <section class="scene" id="scene-reveal" hidden>
+    <div class="koala-slot koala-pop" data-koala></div>
+    <div class="speech" id="reveal-speech">
+      <p id="reveal-text" class="typewriter" aria-live="polite"></p>
+    </div>
+    <button class="btn btn-primary hidden-until-done" id="reveal-next">So… what happens next? 👀</button>
+  </section>
+
+  <!-- ================= SCENE 3: THE UN-REFUSABLE OFFER ================= -->
+  <section class="scene" id="scene-offer" hidden>
+    <div class="koala-slot koala-small" data-koala></div>
+    <h1>Khushi, will you adopt me?</h1>
+    <p class="sub">(please note: this is a formality — the paperwork is already done)</p>
+    <div class="offer-arena" id="offer-arena">
+      <button class="btn btn-yes" id="btn-yes">YES, obviously 🥹</button>
+      <button class="btn btn-no" id="btn-no">no</button>
+    </div>
+    <p class="no-taunt" id="no-taunt" aria-live="polite"></p>
+  </section>
+
+  <!-- ================= SCENE 4: NAMING CEREMONY ================= -->
+  <section class="scene" id="scene-naming" hidden>
+    <div class="koala-slot koala-small" data-koala></div>
+    <h1>You said YES! 🎉</h1>
+    <p class="sub">There is just one crucial matter left.<br>
+    I have gone my whole life without a name. Customs was very confused.</p>
+    <h2 class="naming-q">What shall I be called, forever and ever?</h2>
+    <form id="naming-form" autocomplete="off">
+      <input type="text" id="koala-name-input" maxlength="30" placeholder="my name is…" aria-label="Name for the koala">
+      <button type="submit" class="btn btn-primary">Bestow this name 👑</button>
+    </form>
+    <p class="naming-feedback" id="naming-feedback" aria-live="polite"></p>
+  </section>
+
+  <!-- ================= SCENE 5: THE CERTIFICATE ================= -->
+  <section class="scene" id="scene-certificate" hidden>
+    <div class="koala-slot koala-small no-print" data-koala></div>
+    <div class="certificate" id="certificate">
+      <div class="cert-inner">
+        <div class="cert-crest">🐨</div>
+        <p class="cert-authority">The International Bureau of Koala Affairs<br><small>(Department of Extremely Serious Friendship)</small></p>
+        <h1 class="cert-title">Certificate of Best-Friendship</h1>
+        <p class="cert-body">This certifies that</p>
+        <p class="cert-name">Khushi</p>
+        <p class="cert-body">has officially and irreversibly adopted the koala known as</p>
+        <p class="cert-name cert-koala-name" id="cert-koala-name">…</p>
+        <div class="cert-articles">
+          <p><strong>Article 1.</strong> The koala shall be squeezed on demand, at any hour, without prior notice.</p>
+          <p><strong>Article 2.</strong> All secrets told to the koala are legally sealed in fluff.</p>
+          <p><strong>Article 3.</strong> On days when work is too much, the koala assumes full emotional liability.</p>
+          <p><strong>Article 4.</strong> This contract cannot be terminated. The koala checked. Twice.</p>
+        </div>
+        <div class="cert-footer">
+          <div class="cert-sign">
+            <span class="cert-signature">Khushi</span>
+            <span class="cert-sign-label">The Human</span>
+          </div>
+          <div class="cert-seal" aria-hidden="true">
+            <svg viewBox="0 0 100 100" width="84" height="84">
+              <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="4 3"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <ellipse cx="50" cy="58" rx="13" ry="11" fill="currentColor"/>
+              <ellipse cx="34" cy="42" rx="6" ry="7" fill="currentColor"/>
+              <ellipse cx="46" cy="35" rx="6" ry="7" fill="currentColor"/>
+              <ellipse cx="58" cy="36" rx="6" ry="7" fill="currentColor"/>
+              <ellipse cx="68" cy="44" rx="6" ry="7" fill="currentColor"/>
+            </svg>
+            <span>OFFICIAL PAW</span>
+          </div>
+          <div class="cert-sign">
+            <span class="cert-signature" id="cert-koala-sign">🐾</span>
+            <span class="cert-sign-label">The Koala <small>(cannot write, stamped instead)</small></span>
+          </div>
+        </div>
+        <p class="cert-date" id="cert-date"></p>
+      </div>
+    </div>
+
+    <div class="cert-actions no-print">
+      <button class="btn" id="btn-print">🖨️ Print / save this masterpiece</button>
+      <button class="btn btn-primary" id="btn-to-home">Meet your koala →</button>
+    </div>
+
+    <div class="photo-frame no-print" id="cert-photo-frame">
+      <img src="assets/koala.jpg" alt="The real koala soft toy" id="cert-photo">
+      <p class="photo-caption">This is me in real life. Come collect me from Kavish —<br>I don't fit through the internet. 📦🐨</p>
+    </div>
+  </section>
+
+  <!-- ================= SCENE 6: COMPANION HOME ================= -->
+  <section class="scene" id="scene-home" hidden>
+    <p class="home-greeting" id="home-greeting"></p>
+    <div class="koala-slot koala-home" data-koala id="home-koala-slot"></div>
+    <div class="speech speech-home"><p id="home-speech">*happy koala noises*</p></div>
+
+    <div class="mood-panel">
+      <p class="panel-title">How are you feeling today?</p>
+      <div class="mood-buttons">
+        <button class="btn btn-mood" data-mood="work">work is drowning me 🌊</button>
+        <button class="btn btn-mood" data-mood="tired">I'm exhausted 🥱</button>
+        <button class="btn btn-mood" data-mood="rough">rough day 🌧️</button>
+        <button class="btn btn-mood" data-mood="hi">just saying hi 👋</button>
+      </div>
+    </div>
+
+    <div class="action-panel">
+      <button class="btn btn-hug" id="btn-hug">🫂 EMERGENCY HUG</button>
+      <button class="btn btn-compliment" id="btn-compliment">🐾 dispense compliment</button>
+    </div>
+
+    <div class="secret-panel">
+      <p class="panel-title">Tell me anything. I'm a very good listener.</p>
+      <form id="secret-form" autocomplete="off">
+        <textarea id="secret-input" rows="3" placeholder="anything at all… I'm all ears (they're huge)"></textarea>
+        <button type="submit" class="btn btn-primary">tell the koala 🤫</button>
+      </form>
+      <p class="secret-note">secrets never leave this device — koalas can't type.</p>
+    </div>
+
+    <div class="photo-frame photo-corner" id="home-photo-frame">
+      <img src="assets/koala.jpg" alt="The real koala soft toy" id="home-photo">
+      <p class="photo-caption">me, IRL 🐨</p>
+    </div>
+
+    <button class="restart" id="btn-restart" title="Replay the whole adoption story">↺ replay our story</button>
+  </section>
+
+  <!-- hug overlay -->
+  <div class="hug-overlay" id="hug-overlay" hidden>
+    <div class="koala-slot koala-giant" data-koala="hug"></div>
+    <p class="hug-text" id="hug-text">HUG DELIVERED 🫂<br><small>unlimited refills. no expiry date.</small></p>
+  </div>
+
+  <script src="js/koala.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
