@@ -357,7 +357,27 @@
     "You keep showing up for everyone. I'm the one who shows up for YOU. Forever. It's in the certificate.",
     "One day you'll see yourself the way I see you. Until then, I'll just keep telling you: magnificent.",
     "Doubt is loud, but I'm softer AND more persistent. You can do this. I'd bet all my leaves on you.",
-    "You didn't just adopt a koala. You hired a full-time believer-in-you. I take my job very seriously."
+    "You didn't just adopt a koala. You hired a full-time believer-in-you. I take my job very seriously.",
+    "Those eyes of yours? Entire poems have been written about less. 👀✨",
+    "Official ranking of the prettiest things I've ever seen: 1. Your eyes. 2. Your eyes again. 3. Eucalyptus at sunrise.",
+    "My eyes are hand-stitched by professionals, and they are STILL jealous of yours.",
+    "Your eyes do that sparkle thing when you laugh. Do it more. For research purposes.",
+    "Some people light up a room. Your eyes do it before the rest of you has even walked in.",
+    "I watched the stars the whole way from Australia. Then I saw your eyes and thought: oh — THAT'S what the stars were practising for.",
+    "Warning: prolonged eye contact with Khushi may cause unstoppable joy. I speak from experience. Daily.",
+    "Be as kind to yourself as you are to everyone else. Koala's orders. I outrank your inner critic.",
+    "You take care of everyone. Today, put yourself on your own list. First place, ideally.",
+    "Talk to yourself the way you talk to me: softly, kindly, and with snacks.",
+    "You are not behind in life. You're exactly where your story needs you — and I LOVE this story.",
+    "Loving yourself isn't selfish. It's maintenance on something precious. Signed, the koala in charge of you.",
+    "Look in the mirror today and say one nice thing. Can't think of one? Bring me. I'll narrate. At length.",
+    "You're allowed to take up space, rest, say no, and eat the last piece. All certified by the Bureau of Koala Affairs.",
+    "Quick maths: koalas live 20 years, but soft-toy koalas are immortal. You're stuck with me FOREVER. No refunds.",
+    "In 10 years I'll still be here. In 50? Still here. Slightly flatter, infinitely devoted.",
+    "Every version of you — tired, shining, grumpy, glorious — gets the same koala. This one. Always.",
+    "I'm not a phase, a mood, or an app. I'm furniture-level permanent in your life now.",
+    "Where will I be in your future? Same answer for every single year of it: right next to you.",
+    "One day we'll both be old and worn — me literally. I will STILL be your loudest fan."
   ];
 
   // a caught heart always says something about how lovely she is
@@ -367,7 +387,11 @@
     "This heart says you're gorgeous. I fact-checked it. Twice.",
     "Every heart you catch is one I already gave you. There are… a lot. 💛",
     "Beauty report: still you. It's always you.",
-    "You caught a heart! It was mine. Keep it — I have a lifetime supply where you're concerned."
+    "You caught a heart! It was mine. Keep it — I have a lifetime supply where you're concerned.",
+    "This heart is for your eyes specifically. They know exactly what they did. 👀💛",
+    "Heart secured! Now do the eye-sparkle thing. …There it is. Devastating.",
+    "A heart for the girl with the prettiest eyes in the hemisphere. Both hemispheres. All of them.",
+    "Catch a heart, keep a koala. That's the deal. Duration: your whole life. 💛"
   ];
 
   const STAR_LINES = [
@@ -403,10 +427,24 @@
     "I learned this from a kangaroo. She was a terrible teacher."
   ];
 
-  let lastIdx = { compliment: -1, heart: -1, star: -1, miss: -1, milestone: -1, dance: -1 };
+  /* shuffle-bag picker: every line in a pool is shown once, in random order,
+     before any line can appear again — no more frequent repeats */
+  const bags = {};
+  const lastIdx = {};
   function pick(list, key) {
-    let i;
-    do { i = (Math.random() * list.length) | 0; } while (list.length > 1 && i === lastIdx[key]);
+    let bag = bags[key];
+    if (!bag || !bag.length) {
+      bag = bags[key] = list.map((_, i) => i);
+      for (let i = bag.length - 1; i > 0; i--) {
+        const j = (Math.random() * (i + 1)) | 0;
+        const t = bag[i]; bag[i] = bag[j]; bag[j] = t;
+      }
+      // a fresh bag must not open with the line she just read
+      if (bag.length > 1 && bag[bag.length - 1] === lastIdx[key]) {
+        const t = bag[0]; bag[0] = bag[bag.length - 1]; bag[bag.length - 1] = t;
+      }
+    }
+    const i = bag.pop();
     lastIdx[key] = i;
     return list[i];
   }
