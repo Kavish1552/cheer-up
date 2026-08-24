@@ -433,7 +433,23 @@
   const hintEl = $('#game-hint');
   const homeScene = $('#scene-home');
 
-  const game = { on: false, score: 0, missed: 0, drops: [], x: 0.5, tx: 0.5, lastT: 0, nextSpawn: 0 };
+  const game = {
+    on: false, score: 0, missed: 0, drops: [], x: 0.5, tx: 0.5, lastT: 0, nextSpawn: 0,
+    prevKx: null, lastMove: 0, lastZzz: 0, lastPuff: 0
+  };
+
+  // what a koala mutters when forced to move at speed
+  const EFFORT_PUFFS = ['hup hup hup', 'ugh. cardio.', '*wheeze*', 'is this… jogging??', 'so far away…', 'for you? fine.'];
+
+  function spawnFloaty(cls, text, x, y) {
+    const el = document.createElement('span');
+    el.className = cls;
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    gameArena.appendChild(el);
+    setTimeout(() => el.remove(), 2400);
+  }
 
   function steer(clientX) {
     const r = gameArena.getBoundingClientRect();
@@ -519,12 +535,45 @@
     const dt = Math.min(48, now - game.lastT || 16);
     game.lastT = now;
 
-    // the koala glides toward the finger/cursor
-    game.x += (game.tx - game.x) * Math.min(1, dt * 0.014);
+    // the koala ambles toward the finger/cursor — willing, but never in a hurry
+    let stepX = (game.tx - game.x) * Math.min(1, dt * 0.0105);
+    const maxStep = 0.00055 * dt; // top waddling speed: ~half the arena per second
+    stepX = Math.max(-maxStep, Math.min(maxStep, stepX));
+    game.x += stepX;
     const aw = gameArena.clientWidth;
     const kw = playerSlot.offsetWidth;
     const kx = game.x * Math.max(0, aw - kw);
     playerSlot.style.left = kx + 'px';
+
+    // waddle while moving, lean into the direction, doze off when ignored
+    const v = game.prevKx == null ? 0 : (kx - game.prevKx) / dt;
+    game.prevKx = kx;
+    const kSvg = koalas['player'].svg;
+    if (Math.abs(v) > 0.02) {
+      if (kSvg.classList.contains('k-dozing')) {
+        kSvg.classList.remove('k-dozing');
+        koalas['player'].wiggle(); // rude awakening
+        spawnFloaty('puff', '?! I was NOT sleeping', kx + kw * 0.1, 8);
+      }
+      kSvg.classList.add('k-waddling');
+      playerSlot.classList.toggle('lean-l', v < 0);
+      playerSlot.classList.toggle('lean-r', v > 0);
+      game.lastMove = now;
+      if (Math.abs(v) > maxStep * (aw - kw) * 0.85 && now - game.lastPuff > 2400) {
+        game.lastPuff = now;
+        spawnFloaty('puff', pick(EFFORT_PUFFS, 'puff'), kx + kw * 0.15, 6);
+      }
+    } else {
+      kSvg.classList.remove('k-waddling');
+      playerSlot.classList.remove('lean-l', 'lean-r');
+      if (now - game.lastMove > 4500 && !kSvg.classList.contains('k-dozing')) {
+        kSvg.classList.add('k-dozing');
+      }
+      if (kSvg.classList.contains('k-dozing') && now - game.lastZzz > 1500) {
+        game.lastZzz = now;
+        spawnFloaty('zzz', '💤', kx + kw * 0.68, gameArena.clientHeight - playerSlot.offsetHeight - 14);
+      }
+    }
 
     if (now >= game.nextSpawn) {
       spawnDrop();
@@ -547,6 +596,7 @@
     if (game.on) return;
     game.on = true;
     game.lastT = performance.now();
+    game.lastMove = performance.now(); // give her a moment before the koala dozes off
     game.nextSpawn = performance.now() + 900;
     updateScore();
     requestAnimationFrame(gameTick);

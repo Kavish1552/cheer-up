@@ -182,7 +182,7 @@ h2 { font-size: clamp(1.2rem, 4vw, 1.7rem); font-weight: 700; }
 }
 
 /* ---------- koala part animations ---------- */
-.koala .k-ear, .koala .k-arm, .koala .k-head, .koala .k-pupil, .koala .k-lid {
+.koala .k-ear, .koala .k-arm, .koala .k-head, .koala .k-pupil, .koala .k-lid, .koala .k-foot {
   transform-box: fill-box;
 }
 .koala .k-pupil { transition: transform 0.15s ease-out; transform-origin: center; }
@@ -506,6 +506,59 @@ h2 { font-size: clamp(1.2rem, 4vw, 1.7rem); font-weight: 700; }
   0%   { transform: scale(1); opacity: 1; }
   100% { transform: scale(1.9) translateY(-26px); opacity: 0; }
 }
+/* how a koala actually travels: reluctantly. rocks side to side, feet shuffle */
+.koala.k-waddling { animation: k-waddle 0.5s ease-in-out infinite; }
+@keyframes k-waddle {
+  0%, 100% { transform: rotate(-6deg) translateY(0); }
+  25%      { transform: rotate(0deg) translateY(-6px); }
+  50%      { transform: rotate(6deg) translateY(0); }
+  75%      { transform: rotate(0deg) translateY(-6px); }
+}
+.koala.k-waddling .k-foot { transform-origin: center; animation: k-step 0.5s ease-in-out infinite; }
+.koala.k-waddling .k-foot + .k-foot { animation-delay: 0.25s; }
+@keyframes k-step {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-7px) rotate(-9deg); }
+}
+/* the slot leans into the direction of travel, like effort is involved */
+.koala-slot.koala-player { transition: transform 0.35s ease; }
+.koala-player.lean-l { transform: rotate(-4deg); }
+.koala-player.lean-r { transform: rotate(4deg); }
+
+/* left alone for a few seconds, the koala simply falls asleep on the job */
+.koala.k-dozing { animation: k-doze 3.4s ease-in-out infinite; }
+@keyframes k-doze {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(5px) rotate(-2.5deg); }
+}
+.koala.k-dozing .k-lid { transition: transform 1.4s ease; transform: scaleY(0.6); }
+.koala.k-dozing .k-head { transform: translateY(6px) rotate(-3deg); transition: transform 1.4s ease; }
+
+.zzz {
+  position: absolute;
+  font-size: 20px;
+  pointer-events: none;
+  z-index: 3;
+  animation: zzz-rise 2.2s ease-out forwards;
+}
+@keyframes zzz-rise {
+  from { opacity: 0.9; transform: translateY(0) scale(0.8) rotate(0deg); }
+  to   { opacity: 0; transform: translateY(-48px) scale(1.35) rotate(16deg); }
+}
+.puff {
+  position: absolute;
+  font-size: 13px; font-weight: 800;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.88);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 3;
+  animation: zzz-rise 1.7s ease-out forwards;
+}
+
 .game-hint {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
