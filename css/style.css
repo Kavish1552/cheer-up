@@ -284,6 +284,12 @@ h2 { font-size: clamp(1.2rem, 4vw, 1.7rem); font-weight: 700; }
   border-top: none;
 }
 .speech-home { text-align: center; margin-top: 10px; min-height: 74px; display: flex; align-items: center; justify-content: center; }
+/* on the game page the bubble sits above the arena, so its arrow points down */
+.speech-home::before {
+  top: auto;
+  bottom: -16px;
+  transform: translateX(-50%) rotate(180deg);
+}
 
 .typewriter::after { content: '▋'; animation: caret 0.8s steps(1) infinite; color: var(--euca); }
 .typewriter.done::after { content: ''; }
@@ -438,7 +444,7 @@ h2 { font-size: clamp(1.2rem, 4vw, 1.7rem); font-weight: 700; }
 #scene-home { justify-content: flex-start; padding-top: 44px; gap: 6px; }
 .home-greeting { font-size: clamp(1.3rem, 4.6vw, 2rem); font-weight: 800; }
 
-.mood-panel, .action-panel, .secret-panel {
+.action-panel {
   width: min(560px, 94vw);
   margin-top: 22px;
   background: rgba(255, 255, 255, 0.72);
@@ -446,29 +452,74 @@ h2 { font-size: clamp(1.2rem, 4vw, 1.7rem); font-weight: 700; }
   border-radius: 20px;
   padding: 18px;
   backdrop-filter: blur(3px);
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
 }
-.panel-title { font-weight: 700; margin-bottom: 12px; font-size: 1.08rem; }
-.mood-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
-.btn-mood { font-size: 0.98rem; padding: 12px 14px; }
-
-.action-panel { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 .btn-hug {
   background: var(--coral); border-color: var(--coral-dark); color: #fff;
   box-shadow: 0 4px 0 var(--coral-dark);
   font-size: 1.15rem;
   animation: hint-pulse 2.4s ease-in-out infinite;
 }
-.btn-compliment { background: var(--euca-light); border-color: var(--euca-dark); }
 
-.secret-panel form { display: flex; flex-direction: column; gap: 10px; }
-#secret-input {
-  font-family: inherit; font-size: 1rem;
-  border: 3px solid var(--ink); border-radius: 14px;
-  padding: 12px 14px; resize: vertical; min-height: 72px;
-  background: #fff; color: var(--ink); outline: none;
+/* ---------- the leaf-catching game ---------- */
+.game-arena {
+  position: relative;
+  width: min(560px, 94vw);
+  height: clamp(320px, 48vh, 440px);
+  margin-top: 18px;
+  background:
+    linear-gradient(#EAF4EE 0%, #F6F1E2 78%, #E3EDD9 78%, #DCE8D0 100%);
+  border: 3px solid var(--euca-light);
+  border-radius: 24px;
+  overflow: hidden;
+  touch-action: none;      /* dragging the koala must not scroll the page */
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
 }
-#secret-input:focus { border-color: var(--euca); box-shadow: 0 0 0 4px var(--euca-light); }
-.secret-note { font-size: 0.82rem; opacity: 0.6; margin-top: 10px; font-style: italic; }
+.koala-slot.koala-player {
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  width: 96px;
+  will-change: left;
+  pointer-events: none;    /* the finger steers via the arena, not the koala */
+  z-index: 2;
+}
+.drop {
+  position: absolute;
+  top: 0; left: 0;
+  font-size: 32px;
+  line-height: 1;
+  will-change: transform;
+  pointer-events: none;
+  z-index: 1;
+}
+.drop > span { display: inline-block; }
+.drop > span.caught { animation: drop-caught 0.45s ease-out forwards; }
+@keyframes drop-caught {
+  0%   { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.9) translateY(-26px); opacity: 0; }
+}
+.game-hint {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  font-weight: 700; font-size: 1.1rem;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.55);
+  z-index: 3;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  animation: hint-pulse 2s ease-in-out infinite;
+}
+.game-hint.off { opacity: 0; animation: none; }
+.game-score {
+  margin-top: 12px;
+  font-weight: 700;
+  font-size: 1.02rem;
+  min-height: 1.6em;
+}
 
 .restart {
   margin-top: 30px; background: none; border: none;

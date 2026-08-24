@@ -15,9 +15,11 @@ un-refusable **adoption ceremony** — built to cheer up one very specific perso
 4. **Naming Ceremony** — she names the koala; the name is remembered forever
    (in her browser's localStorage).
 5. **Certificate of Best-Friendship** — official, printable, gloriously silly.
-6. **Companion Home** — the permanent page: mood buttons for rough days,
-   an emergency hug button, a compliment dispenser, and a "tell me anything"
-   box (nothing is stored or sent anywhere — koalas can't type).
+6. **Companion Home** — the permanent page: a leaf-catching game where she
+   slides the koala to catch falling leaves, hearts and stars, and the koala
+   compliments her as she plays (missing a leaf just earns a reassurance that
+   the koala isn't going anywhere — losing is not implemented). Plus an
+   emergency hug button.
 
 Pure static HTML/CSS/JS. No build step, no dependencies, no tracking.
 

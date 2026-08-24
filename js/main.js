@@ -324,38 +324,7 @@
   $('#btn-print').addEventListener('click', () => window.print());
   $('#btn-to-home').addEventListener('click', enterHome);
 
-  /* ================= SCENE 6: companion home ================= */
-  const RESPONSES = {
-    work: [
-      "Deep breath. The inbox is not the boss of you — technically *I* am, per Article 3. New plan: one small thing at a time, then a hug. 🌊",
-      "Work update from the eucalyptus tree: none of it will matter in 100 years, but your nap tonight will. Prioritise accordingly. 😌",
-      "I have reviewed your workload and I am officially confiscating 20% of it. It's fluff now. Legally fluff.",
-      "You know what koalas do under pressure? We sleep 20 hours a day. I'm not saying copy me exactly… but maybe 8? 💤",
-      "Drowning is only allowed in blankets. Come here, one squeeze, then we conquer exactly ONE task. Deal?"
-    ],
-    tired: [
-      "Excellent news: I am a certified pillow. Sixteen years of training. Assume the position. 🥱",
-      "Exhaustion detected. Prescription: tea, blanket, me, and absolutely zero productivity for one hour. Doctor Koala has spoken.",
-      "You've been running on 1% battery and still shining. Imagine you at full charge. Terrifying. Beautiful. Now REST.",
-      "Fun fact: eucalyptus leaves are basically nature's espresso for me, and I STILL nap 20 hours. Rest is a skill. I'll teach you.",
-      "Close the laptop. Close your eyes. I'll keep watch. Nothing gets past these ears — they're enormous. 🐨"
-    ],
-    rough: [
-      "Rough days are just plot development, and you're obviously the main character. I'm the loyal sidekick. It's a great show. 🌧️→🌤️",
-      "Per Article 3 of our contract, I hereby assume full emotional liability for today. Hand it over. All of it.",
-      "Come here. You don't have to explain anything. I have soft ears and zero judgement — mostly because I can't talk.",
-      "Today was heavy. You carried it anyway. That's not weakness, that's you being quietly ridiculous levels of strong.",
-      "Rating today: 2/10. Rating you for surviving it: 10/10, would climb. Tomorrow we try again — together."
-    ],
-    hi: [
-      "HI!! You came to see me!! This is the best thing that has happened since I discovered I have a belly to pat. 👋",
-      "Hello, keeper of my heart and haver of excellent taste in koalas. How are we today?",
-      "*waves with both stubby arms* This is my maximum wave. You deserve nothing less.",
-      "Just saying hi?? To ME?? I will be riding this high for the rest of the week.",
-      "Hi hi hi! Quick reminder while you're here: you're doing better than you think you are. Okay carry on. 🌿"
-    ]
-  };
-
+  /* ================= SCENE 6: the leaf-catching game ================= */
   const COMPLIMENTS = [
     "Official koala assessment: 10/10, would climb. 🐾",
     "You have the emotional range of a sunrise and the work ethic of an entire ant colony. Rest is still mandatory though.",
@@ -379,16 +348,41 @@
     "You + blanket + me = the safest place on Earth. That's just maths."
   ];
 
-  const SECRET_REPLIES = [
-    "I heard all of it. It's in the fluff vault now. Sealed forever. 🤫",
-    "Mm. Mmhm. *nods slowly* …I understand completely. Also you're safe with me.",
-    "Secret received and swallowed. Koalas are legally unsubpoenable. Probably.",
-    "Thank you for telling me. Whatever it is — you're still my favourite human. It's not close.",
-    "*hugs the secret* *hugs you* Both are safe now.",
-    "Noted with all four paws. And hey — carrying that alone was heavy. You don't have to anymore."
+  // a caught heart always says something about how lovely she is
+  const HEART_LINES = [
+    "A heart! Fitting — you caught mine ages ago. Also: you're beautiful. That's just a fact I keep noticing. 💛",
+    "Official heart delivery for Khushi: you are beautiful. Inside, outside, and at 2am on a bad day.",
+    "This heart says you're gorgeous. I fact-checked it. Twice.",
+    "Every heart you catch is one I already gave you. There are… a lot. 💛",
+    "Beauty report: still you. It's always you.",
+    "You caught a heart! It was mine. Keep it — I have a lifetime supply where you're concerned."
   ];
 
-  let lastIdx = { work: -1, tired: -1, rough: -1, hi: -1, compliment: -1, secret: -1 };
+  const STAR_LINES = [
+    "A star! For the most stellar human in any hemisphere. ⭐",
+    "You caught a star — understandable, like attracts like.",
+    "Stars are just the sky's way of applauding you. I taught them that. ⭐",
+    "Careful with that star. It's been dreaming of meeting you. Same, honestly."
+  ];
+
+  // missing a leaf is exactly when the koala proves it isn't going anywhere
+  const MISS_LINES = [
+    "Missed one? The leaf fell. I didn't. I never will. 🐨",
+    "You don't have to catch everything, Khushi. Whatever drops — I've got you.",
+    "Some leaves get away. Best friends don't. Exhibit A: me.",
+    "No score can change this: wherever you are is where I'll be.",
+    "Psst. Even on the days you drop everything, you're still my favourite. Especially then."
+  ];
+
+  // every 25 leaves, the promise gets bigger
+  const MILESTONE_LINES = [
+    "25 leaves! Look at us. Rain, deadlines, rough days — I'm in ALL of them with you. Permanently. 💛",
+    "Our tree is getting enormous, and so is my promise: you will never do a hard day alone again.",
+    "At this point the tree is basically a landmark. So is this fact: you + me. Always. Non-negotiable.",
+    "Every leaf we've caught is a day I plan to spend with you. We're going to need a bigger tree. 🌳"
+  ];
+
+  let lastIdx = { compliment: -1, heart: -1, star: -1, miss: -1, milestone: -1 };
   function pick(list, key) {
     let i;
     do { i = (Math.random() * list.length) | 0; } while (list.length > 1 && i === lastIdx[key]);
@@ -405,26 +399,137 @@
   function enterHome() {
     const name = store.name || 'your koala';
     $('#home-greeting').textContent = `Khushi & ${name} — best friends, officially. 💛`;
-    speak(`*${name} is here, blinking at you lovingly*`);
+    speak(`Let's grow our friendship tree! Slide me around and catch the leaves — I'll handle the complimenting. 🍃`);
     showScene('scene-home');
-    koalas['scene-home'].wave();
+    koalas['player'].wave();
+    startGame();
   }
 
-  document.querySelectorAll('.btn-mood').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const mood = btn.dataset.mood;
-      speak(pick(RESPONSES[mood], mood));
-      const k = koalas['scene-home'];
-      if (mood === 'hi') { k.wave(); k.bounce(); }
-      else if (mood === 'rough') { k.nod(); }
-      else { k.nod(); setTimeout(() => k.wiggle(), 1400); }
-    });
+  /* --- the game: catch leaves, receive love. losing is not implemented. --- */
+  const gameArena = $('#game-arena');
+  const playerSlot = $('#player-slot');
+  const scoreEl = $('#game-score');
+  const hintEl = $('#game-hint');
+  const homeScene = $('#scene-home');
+
+  const game = { on: false, score: 0, missed: 0, drops: [], x: 0.5, tx: 0.5, lastT: 0, nextSpawn: 0 };
+
+  function steer(clientX) {
+    const r = gameArena.getBoundingClientRect();
+    if (!r.width) return;
+    game.tx = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+    hintEl.classList.add('off');
+  }
+  gameArena.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    gameArena.setPointerCapture(e.pointerId);
+    steer(e.clientX);
+  });
+  gameArena.addEventListener('pointermove', (e) => steer(e.clientX));
+  document.addEventListener('keydown', (e) => {
+    if (homeScene.hidden) return;
+    if (e.key === 'ArrowLeft') { game.tx = Math.max(0, game.tx - 0.1); hintEl.classList.add('off'); }
+    if (e.key === 'ArrowRight') { game.tx = Math.min(1, game.tx + 0.1); hintEl.classList.add('off'); }
   });
 
-  $('#btn-compliment').addEventListener('click', () => {
-    speak(pick(COMPLIMENTS, 'compliment'));
-    koalas['scene-home'].wiggle();
-  });
+  function spawnDrop() {
+    const roll = Math.random();
+    const type = roll < 0.13 ? 'heart' : roll < 0.2 ? 'star' : 'leaf';
+    const el = document.createElement('span');
+    el.className = 'drop';
+    el.innerHTML = '<span>' + (type === 'heart' ? '💛' : type === 'star' ? '⭐' : '🍃') + '</span>';
+    gameArena.appendChild(el);
+    game.drops.push({
+      el: el, type: type,
+      x: 18 + Math.random() * Math.max(40, gameArena.clientWidth - 68),
+      y: -36,
+      speed: 0.09 + Math.random() * 0.05 + Math.min(0.07, game.score * 0.001),
+      sway: 8 + Math.random() * 16,
+      phase: Math.random() * 6.28
+    });
+  }
+
+  function removeDrop(d, caught) {
+    game.drops.splice(game.drops.indexOf(d), 1);
+    if (caught) {
+      d.el.firstChild.classList.add('caught');
+      setTimeout(() => d.el.remove(), 480);
+    } else {
+      d.el.remove();
+    }
+  }
+
+  function updateScore() {
+    const n = game.score;
+    scoreEl.textContent = `🍃 ${n} caught — ` + (
+      n === 0 ? 'let’s grow our friendship tree' :
+      n < 10 ? 'our friendship tree is sprouting' :
+      n < 25 ? 'our friendship tree is growing tall' :
+      n < 50 ? 'our tree is magnificent. like you.' :
+      'this is a whole forest of us now');
+  }
+
+  function onCatch(d) {
+    removeDrop(d, true);
+    game.score++;
+    updateScore();
+    const k = koalas['player'];
+    if (d.type === 'heart') { speak(pick(HEART_LINES, 'heart')); k.squeeze(); }
+    else if (d.type === 'star') { burstConfetti(50); speak(pick(STAR_LINES, 'star')); k.bounce(); }
+    else if (game.score % 25 === 0) { burstConfetti(150); speak(pick(MILESTONE_LINES, 'milestone')); k.bounce(); }
+    else if (game.score % 5 === 0) { speak(pick(COMPLIMENTS, 'compliment')); k.wiggle(); }
+  }
+
+  function onMiss(d) {
+    removeDrop(d, false);
+    game.missed++;
+    if (game.missed % 6 === 0) { speak(pick(MISS_LINES, 'miss')); koalas['player'].nod(); }
+  }
+
+  function gameTick(now) {
+    if (!game.on) return;
+    if (homeScene.hidden) {
+      // she left for the story replay: stop cleanly, keep the score for later
+      game.on = false;
+      game.drops.forEach(d => d.el.remove());
+      game.drops.length = 0;
+      return;
+    }
+    const dt = Math.min(48, now - game.lastT || 16);
+    game.lastT = now;
+
+    // the koala glides toward the finger/cursor
+    game.x += (game.tx - game.x) * Math.min(1, dt * 0.014);
+    const aw = gameArena.clientWidth;
+    const kw = playerSlot.offsetWidth;
+    const kx = game.x * Math.max(0, aw - kw);
+    playerSlot.style.left = kx + 'px';
+
+    if (now >= game.nextSpawn) {
+      spawnDrop();
+      game.nextSpawn = now + Math.max(520, 1000 - game.score * 6);
+    }
+
+    const ah = gameArena.clientHeight;
+    const catchY = ah - playerSlot.offsetHeight * 0.85;
+    for (const d of game.drops.slice()) {
+      d.y += d.speed * dt;
+      const dx = d.x + Math.sin(d.y / 46 + d.phase) * d.sway;
+      d.el.style.transform = `translate(${dx}px, ${d.y}px)`;
+      if (d.y >= catchY && Math.abs(dx + 16 - (kx + kw / 2)) < kw * 0.58) { onCatch(d); }
+      else if (d.y >= ah - 8) { onMiss(d); }
+    }
+    requestAnimationFrame(gameTick);
+  }
+
+  function startGame() {
+    if (game.on) return;
+    game.on = true;
+    game.lastT = performance.now();
+    game.nextSpawn = performance.now() + 900;
+    updateScore();
+    requestAnimationFrame(gameTick);
+  }
 
   /* --- emergency hug --- */
   const hugOverlay = $('#hug-overlay');
@@ -441,27 +546,6 @@
       hugOverlay.hidden = true;
       speak('Hug delivered. Unlimited refills — no expiry date. 🫂');
     }
-  });
-
-  /* --- tell me anything --- */
-  let nodTimer = null;
-  $('#secret-input').addEventListener('input', () => {
-    // the koala visibly listens while she types (throttled so it doesn't spasm)
-    if (nodTimer) return;
-    koalas['scene-home'].nod();
-    nodTimer = setTimeout(() => { nodTimer = null; }, 1500);
-  });
-
-  $('#secret-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const input = $('#secret-input');
-    if (!input.value.trim()) {
-      speak("You can tell me anything. Even '…'. Especially '…'.");
-      return;
-    }
-    input.value = ''; // nothing is stored, nothing is sent — straight into the fluff vault
-    speak(pick(SECRET_REPLIES, 'secret'));
-    koalas['scene-home'].squeeze();
   });
 
   /* --- replay the story --- */

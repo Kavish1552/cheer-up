@@ -134,31 +134,16 @@
   <!-- ================= SCENE 6: COMPANION HOME ================= -->
   <section class="scene" id="scene-home" hidden>
     <p class="home-greeting" id="home-greeting"></p>
-    <div class="koala-slot koala-home" data-koala id="home-koala-slot"></div>
     <div class="speech speech-home"><p id="home-speech">*happy koala noises*</p></div>
 
-    <div class="mood-panel">
-      <p class="panel-title">How are you feeling today?</p>
-      <div class="mood-buttons">
-        <button class="btn btn-mood" data-mood="work">work is drowning me 🌊</button>
-        <button class="btn btn-mood" data-mood="tired">I'm exhausted 🥱</button>
-        <button class="btn btn-mood" data-mood="rough">rough day 🌧️</button>
-        <button class="btn btn-mood" data-mood="hi">just saying hi 👋</button>
-      </div>
+    <div class="game-arena" id="game-arena">
+      <div class="game-hint" id="game-hint">🍃 slide me left &amp; right —<br>catch the falling leaves!</div>
+      <div class="koala-slot koala-player" data-koala="player" id="player-slot"></div>
     </div>
+    <p class="game-score" id="game-score" aria-live="polite">🍃 0 caught</p>
 
     <div class="action-panel">
       <button class="btn btn-hug" id="btn-hug">🫂 EMERGENCY HUG</button>
-      <button class="btn btn-compliment" id="btn-compliment">🐾 dispense compliment</button>
-    </div>
-
-    <div class="secret-panel">
-      <p class="panel-title">Tell me anything. I'm a very good listener.</p>
-      <form id="secret-form" autocomplete="off">
-        <textarea id="secret-input" rows="3" placeholder="anything at all… I'm all ears (they're huge)"></textarea>
-        <button type="submit" class="btn btn-primary">tell the koala 🤫</button>
-      </form>
-      <p class="secret-note">secrets never leave this device — koalas can't type.</p>
     </div>
 
     <div class="photo-frame photo-corner" id="home-photo-frame">
