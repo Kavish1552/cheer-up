@@ -296,7 +296,7 @@ h2 { font-size: clamp(1.2rem, 4vw, 1.7rem); font-weight: 700; }
 .offer-arena {
   position: relative;
   width: min(560px, 92vw);
-  min-height: 220px;
+  min-height: 300px;
   margin-top: 26px;
   display: flex;
   align-items: center;
@@ -314,10 +314,28 @@ h2 { font-size: clamp(1.2rem, 4vw, 1.7rem); font-weight: 700; }
 .btn-yes.mega { font-size: 1.6rem; padding: 22px 44px; }
 .btn-no {
   background: var(--cream-dark);
-  transition: all 0.18s ease;
   z-index: 1;
+  /* --s carries the shrink factor so the hop animation can compose with it */
+  transform: scale(var(--s, 1));
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
-.btn-no.fleeing { position: absolute; margin: 0; }
+/* the shrink must survive :active, which otherwise nudges the button down */
+.btn-no:active { transform: scale(var(--s, 1)); }
+.btn-no.fleeing {
+  position: absolute;
+  margin: 0;
+  transition: left 0.26s cubic-bezier(0.3, 1.3, 0.5, 1),
+              top  0.26s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+.btn-no.hop { animation: no-hop 0.42s cubic-bezier(0.3, 1.4, 0.5, 1); }
+@keyframes no-hop {
+  0%   { transform: scale(var(--s, 1)) translateY(0) rotate(0deg); }
+  35%  { transform: scale(calc(var(--s, 1) * 1.18)) translateY(-16px) rotate(-9deg); }
+  70%  { transform: scale(var(--s, 1)) translateY(0) rotate(5deg); }
+  100% { transform: scale(var(--s, 1)) translateY(0) rotate(0deg); }
+}
 .no-taunt { min-height: 1.6em; margin-top: 14px; font-size: 1.05rem; font-style: italic; opacity: 0.8; }
 
 /* ================= scene 4: naming ================= */

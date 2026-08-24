@@ -150,46 +150,122 @@
     "okay fine. FINE. I'll press it for you…"
   ];
 
-  function fleeNo() {
-    // on touch devices a single tap can fire both pointerenter and touchstart
+  // a mouse can be dodged on hover; a finger cannot, so touch gets its own path
+  // (?touch=1 forces the touch path, so it can be checked on a desktop browser)
+  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+    !new URLSearchParams(location.search).has('touch');
+  // each tap is deliberate effort, so touch reaches the surrender sooner
+  const MAX_ATTEMPTS = canHover ? NO_LINES.length : 5;
+
+  /* Choose where the button lands: never under the finger that just tapped it,
+     never overlapping YES (an accidental adoption is a different joke), and
+     always fully inside the arena so it can't escape off-screen. */
+  function pickSafeSpot(avoidClientX, avoidClientY) {
+    const a = arena.getBoundingClientRect();
+    const y = yesBtn.getBoundingClientRect();
+    const bw = noBtn.offsetWidth;
+    const bh = noBtn.offsetHeight;
+    const maxX = Math.max(0, a.width - bw);
+    const maxY = Math.max(0, a.height - bh);
+
+    const pad = 16;
+    const yx1 = y.left - a.left - pad, yx2 = y.right - a.left + pad;
+    const yy1 = y.top - a.top - pad,   yy2 = y.bottom - a.top + pad;
+
+    const avoidX = avoidClientX == null ? maxX / 2 : avoidClientX - a.left;
+    const avoidY = avoidClientY == null ? maxY / 2 : avoidClientY - a.top;
+
+    const here = { x: parseFloat(noBtn.style.left) || 0, y: parseFloat(noBtn.style.top) || 0 };
+    const COLS = 5, ROWS = 4;
+    const spots = [];
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const x = maxX * (c / (COLS - 1));
+        const yy = maxY * (r / (ROWS - 1));
+        if (x + bw > yx1 && x < yx2 && yy + bh > yy1 && yy < yy2) continue; // sits on YES
+        if (Math.abs(x - here.x) < 12 && Math.abs(yy - here.y) < 12) continue; // where it already is
+        spots.push({ x: x, y: yy, d: Math.hypot(x + bw / 2 - avoidX, yy + bh / 2 - avoidY) });
+      }
+    }
+    if (!spots.length) return { x: Math.random() * maxX, y: Math.random() * maxY };
+
+    // pick at random from the far half, so it always escapes but never
+    // ping-pongs between the same two corners
+    spots.sort((p, q) => q.d - p.d);
+    const far = spots.slice(0, Math.max(3, Math.ceil(spots.length / 2)));
+    return far[(Math.random() * far.length) | 0];
+  }
+
+  function fleeNo(clientX, clientY) {
+    if (noBtn.dataset.surrendered) return;
+    // one tap can raise several events (pointerdown, touchstart, click)
     const now = Date.now();
-    if (now - lastFlee < 150) return;
+    if (now - lastFlee < 250) return;
     lastFlee = now;
     noAttempts++;
+
     // scene direction: the koala looks sadder with every refusal attempt
     koalas['scene-offer'].sad(true);
     setTimeout(() => koalas['scene-offer'].sad(false), 900);
 
-    taunt.textContent = NO_LINES[Math.min(noAttempts - 1, NO_LINES.length - 1)];
+    // walk the whole taunt arc regardless of how many attempts it takes
+    const step = MAX_ATTEMPTS > 1 ? (noAttempts - 1) / (MAX_ATTEMPTS - 1) : 1;
+    taunt.textContent = NO_LINES[Math.min(NO_LINES.length - 1, Math.round(step * (NO_LINES.length - 1)))];
+    yesBtn.classList.add('mega');
 
-    if (noAttempts >= NO_LINES.length) {
+    if (noAttempts >= MAX_ATTEMPTS) {
       // the No button gives up and defects to the koala's side
       noBtn.textContent = 'YES (the button surrendered) 🏳️';
-      noBtn.classList.remove('btn-no', 'fleeing');
+      noBtn.classList.remove('btn-no', 'fleeing', 'hop');
       noBtn.classList.add('btn-yes');
-      noBtn.style.cssText = '';
+      noBtn.removeAttribute('style');
       noBtn.dataset.surrendered = 'yes';
-      yesBtn.classList.add('mega');
+      taunt.textContent = "okay fine. FINE. I'll press it for you…";
       return;
     }
 
     noBtn.classList.add('fleeing');
-    const scale = Math.max(0.35, 1 - noAttempts * 0.13);
-    const maxX = arena.clientWidth - noBtn.offsetWidth;
-    const maxY = arena.clientHeight - noBtn.offsetHeight;
-    noBtn.style.left = Math.random() * Math.max(0, maxX) + 'px';
-    noBtn.style.top = Math.random() * Math.max(0, maxY) + 'px';
-    noBtn.style.transform = `scale(${scale})`;
-    yesBtn.classList.add('mega');
+    noBtn.style.setProperty('--s', Math.max(0.45, 1 - noAttempts * 0.11));
+    const spot = pickSafeSpot(clientX, clientY);
+    noBtn.style.left = spot.x + 'px';
+    noBtn.style.top = spot.y + 'px';
+
+    noBtn.classList.remove('hop');
+    void noBtn.offsetWidth; // restart the hop if it is still mid-animation
+    noBtn.classList.add('hop');
   }
 
-  // desktop: dodge the cursor before it arrives; touch: jump before the tap lands
-  noBtn.addEventListener('pointerenter', () => { if (!noBtn.dataset.surrendered) fleeNo(); });
-  noBtn.addEventListener('touchstart', (e) => {
-    if (!noBtn.dataset.surrendered) { e.preventDefault(); fleeNo(); }
-  }, { passive: false });
-  noBtn.addEventListener('click', () => {
-    if (noBtn.dataset.surrendered) { acceptAdoption(); } else { fleeNo(); }
+  if (canHover) {
+    // desktop: dodge the cursor before it ever arrives
+    noBtn.addEventListener('pointerenter', (e) => fleeNo(e.clientX, e.clientY));
+  } else {
+    // touch: leap away as the finger lands, and swallow the tap so no click follows
+    noBtn.addEventListener('pointerdown', (e) => {
+      if (noBtn.dataset.surrendered) return;
+      e.preventDefault();
+      fleeNo(e.clientX, e.clientY);
+    });
+    noBtn.addEventListener('touchstart', (e) => {
+      if (noBtn.dataset.surrendered) return;
+      e.preventDefault(); // fallback for browsers without pointer events
+      const t = e.touches[0];
+      fleeNo(t ? t.clientX : null, t ? t.clientY : null);
+    }, { passive: false });
+  }
+
+  noBtn.addEventListener('click', (e) => {
+    if (noBtn.dataset.surrendered) { acceptAdoption(); return; }
+    e.preventDefault();
+    if (canHover) fleeNo(e.clientX, e.clientY); // a very fast mouse can still land one
+  });
+
+  // keep the fugitive inside the arena if the screen rotates or resizes
+  window.addEventListener('resize', () => {
+    if (!noBtn.classList.contains('fleeing')) return;
+    const maxX = Math.max(0, arena.clientWidth - noBtn.offsetWidth);
+    const maxY = Math.max(0, arena.clientHeight - noBtn.offsetHeight);
+    noBtn.style.left = Math.min(parseFloat(noBtn.style.left) || 0, maxX) + 'px';
+    noBtn.style.top = Math.min(parseFloat(noBtn.style.top) || 0, maxY) + 'px';
   });
 
   yesBtn.addEventListener('click', acceptAdoption);
