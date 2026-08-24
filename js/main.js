@@ -345,7 +345,19 @@
     "You're proof that the best people are the ones who don't even realise it.",
     "Your name means happiness, and honestly? Accurate labelling. Refreshing.",
     "The world is measurably better with you in it. This is peer-reviewed. The peer was me.",
-    "You + blanket + me = the safest place on Earth. That's just maths."
+    "You + blanket + me = the safest place on Earth. That's just maths.",
+    "You've handled every 'impossible' week so far. At this point, impossible should be scared of YOU.",
+    "Reminder from your koala: rest is productive too, and nobody has earned it harder than you.",
+    "Whatever tomorrow throws at you, it has to get through me first. I'm small but extremely committed.",
+    "I've watched you keep going when it was hard. That's not luck — that's you being quietly extraordinary.",
+    "Big meeting? Long day? Take me along in your head. I'll be cheering from the eucalyptus. 📣",
+    "You're allowed to be tired. You're NOT allowed to forget how amazing you are. That's my department now.",
+    "Life upgrade complete: you now come with a built-in koala. Rough days have lost their advantage.",
+    "When it all feels heavy, squeeze me. I convert stress into fluff. It's science. Fluff-based science.",
+    "You keep showing up for everyone. I'm the one who shows up for YOU. Forever. It's in the certificate.",
+    "One day you'll see yourself the way I see you. Until then, I'll just keep telling you: magnificent.",
+    "Doubt is loud, but I'm softer AND more persistent. You can do this. I'd bet all my leaves on you.",
+    "You didn't just adopt a koala. You hired a full-time believer-in-you. I take my job very seriously."
   ];
 
   // a caught heart always says something about how lovely she is
@@ -382,7 +394,16 @@
     "Every leaf we've caught is a day I plan to spend with you. We're going to need a bigger tree. 🌳"
   ];
 
-  let lastIdx = { compliment: -1, heart: -1, star: -1, miss: -1, milestone: -1 };
+  const DANCE_LINES = [
+    "initiating the forbidden koala shuffle… 🕺",
+    "these moves are why I'm not allowed back in Australia.",
+    "DJ, drop the eucalyptus beat! 🪩",
+    "warning: professional fluff at work. do not attempt at home.",
+    "this one's called 'deadline? WHAT deadline?'",
+    "I learned this from a kangaroo. She was a terrible teacher."
+  ];
+
+  let lastIdx = { compliment: -1, heart: -1, star: -1, miss: -1, milestone: -1, dance: -1 };
   function pick(list, key) {
     let i;
     do { i = (Math.random() * list.length) | 0; } while (list.length > 1 && i === lastIdx[key]);
@@ -443,7 +464,7 @@
       el: el, type: type,
       x: 18 + Math.random() * Math.max(40, gameArena.clientWidth - 68),
       y: -36,
-      speed: 0.09 + Math.random() * 0.05 + Math.min(0.07, game.score * 0.001),
+      speed: 0.055 + Math.random() * 0.03 + Math.min(0.04, game.score * 0.0005),
       sway: 8 + Math.random() * 16,
       phase: Math.random() * 6.28
     });
@@ -507,7 +528,7 @@
 
     if (now >= game.nextSpawn) {
       spawnDrop();
-      game.nextSpawn = now + Math.max(520, 1000 - game.score * 6);
+      game.nextSpawn = now + Math.max(800, 1350 - game.score * 5);
     }
 
     const ah = gameArena.clientHeight;
@@ -531,22 +552,93 @@
     requestAnimationFrame(gameTick);
   }
 
-  /* --- emergency hug --- */
+  /* --- emergency hug: arms open, koala comes close, arms wrap, screen squeezes --- */
   const hugOverlay = $('#hug-overlay');
+  const hugText = $('#hug-text');
+  let hugTimers = [];
+
+  function spawnHugHearts(count) {
+    const emojis = ['💛', '💚', '🤍', '💛'];
+    for (let i = 0; i < count; i++) {
+      const h = document.createElement('span');
+      h.className = 'hug-heart';
+      h.textContent = emojis[(Math.random() * emojis.length) | 0];
+      h.style.left = 4 + Math.random() * 92 + '%';
+      h.style.fontSize = 22 + Math.random() * 22 + 'px';
+      h.style.animationDuration = 3 + Math.random() * 2.5 + 's';
+      h.style.animationDelay = Math.random() * 2.2 + 's';
+      hugOverlay.appendChild(h);
+      setTimeout(() => h.remove(), 8000);
+    }
+  }
+
   $('#btn-hug').addEventListener('click', () => {
     hugOverlay.hidden = false;
-    const k = koalas['hug'];
-    k.squeeze();
-    burstConfetti(60);
-    const again = setInterval(() => k.squeeze(), 1600);
-    setTimeout(close, 3400);
-    hugOverlay.addEventListener('click', close, { once: true });
-    function close() {
-      clearInterval(again);
-      hugOverlay.hidden = true;
-      speak('Hug delivered. Unlimited refills — no expiry date. 🫂');
-    }
+    hugOverlay.classList.remove('hugging');
+    void hugOverlay.offsetWidth; // restart the choreography on every hug
+    hugOverlay.classList.add('hugging');
+    hugText.textContent = 'come here, Khushi… 🤗';
+    spawnHugHearts(12);
+
+    hugTimers.forEach(clearTimeout);
+    hugTimers = [
+      setTimeout(() => { hugText.textContent = '*S Q U E E Z E* 💛'; }, 2500),
+      setTimeout(() => {
+        hugText.innerHTML = 'HUG DELIVERED 🫂<br><small>unlimited refills. no expiry date.</small>';
+        burstConfetti(70);
+      }, 3800),
+      setTimeout(closeHug, 6200)
+    ];
+    hugOverlay.addEventListener('click', closeHug, { once: true });
   });
+
+  function closeHug() {
+    if (hugOverlay.hidden) return;
+    hugTimers.forEach(clearTimeout);
+    hugOverlay.classList.remove('hugging');
+    hugOverlay.hidden = true;
+    speak('Hug stored in your bones. Redeem the real one from me anytime. 💛');
+  }
+
+  /* --- koala dance: disco lights, music notes, the forbidden shuffle --- */
+  const danceOverlay = $('#dance-overlay');
+  const danceText = $('#dance-text');
+  let danceTimers = [];
+  let noteTimer = null;
+
+  function spawnNote() {
+    const n = document.createElement('span');
+    n.className = 'dance-note';
+    n.textContent = ['🎵', '🎶', '♪', '♫'][(Math.random() * 4) | 0];
+    n.style.left = 6 + Math.random() * 88 + '%';
+    n.style.animationDuration = 1.8 + Math.random() * 1.4 + 's';
+    danceOverlay.appendChild(n);
+    setTimeout(() => n.remove(), 3400);
+  }
+
+  $('#btn-dance').addEventListener('click', () => {
+    danceOverlay.hidden = false;
+    koalas['dance'].svg.classList.add('k-dancing');
+    danceText.textContent = pick(DANCE_LINES, 'dance');
+    noteTimer = setInterval(spawnNote, 280);
+
+    danceTimers.forEach(clearTimeout);
+    danceTimers = [
+      setTimeout(() => { danceText.textContent = pick(DANCE_LINES, 'dance'); }, 3000),
+      setTimeout(() => { danceText.textContent = pick(DANCE_LINES, 'dance'); }, 6000),
+      setTimeout(closeDance, 8500)
+    ];
+    danceOverlay.addEventListener('click', closeDance, { once: true });
+  });
+
+  function closeDance() {
+    if (danceOverlay.hidden) return;
+    danceTimers.forEach(clearTimeout);
+    clearInterval(noteTimer);
+    koalas['dance'].svg.classList.remove('k-dancing');
+    danceOverlay.hidden = true;
+    speak("*pant pant* I only dance like that for you. What happens in the eucalyptus stays in the eucalyptus. 🕺");
+  }
 
   /* --- replay the story --- */
   $('#btn-restart').addEventListener('click', () => {

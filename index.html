@@ -144,6 +144,7 @@
 
     <div class="action-panel">
       <button class="btn btn-hug" id="btn-hug">🫂 EMERGENCY HUG</button>
+      <button class="btn btn-dance" id="btn-dance">🪩 KOALA DANCE</button>
     </div>
 
     <div class="photo-frame photo-corner" id="home-photo-frame">
@@ -157,7 +158,15 @@
   <!-- hug overlay -->
   <div class="hug-overlay" id="hug-overlay" hidden>
     <div class="koala-slot koala-giant" data-koala="hug"></div>
-    <p class="hug-text" id="hug-text">HUG DELIVERED 🫂<br><small>unlimited refills. no expiry date.</small></p>
+    <p class="hug-text" id="hug-text"></p>
+    <div class="hug-vignette" aria-hidden="true"></div>
+  </div>
+
+  <!-- dance overlay -->
+  <div class="dance-overlay" id="dance-overlay" hidden>
+    <div class="disco-ball" aria-hidden="true">🪩</div>
+    <div class="koala-slot koala-dance" data-koala="dance"></div>
+    <p class="hug-text" id="dance-text"></p>
   </div>
 
   <script src="js/koala.js"></script>

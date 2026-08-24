@@ -19,7 +19,9 @@ un-refusable **adoption ceremony** — built to cheer up one very specific perso
    slides the koala to catch falling leaves, hearts and stars, and the koala
    compliments her as she plays (missing a leaf just earns a reassurance that
    the koala isn't going anywhere — losing is not implemented). Plus an
-   emergency hug button.
+   emergency hug button (a full-screen embrace with wrapping arms and
+   floating hearts) and a koala dance button (disco lights, music notes,
+   the forbidden koala shuffle).
 
 Pure static HTML/CSS/JS. No build step, no dependencies, no tracking.
 
